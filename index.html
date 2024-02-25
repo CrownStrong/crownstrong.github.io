@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8" />
+	<!-- <title>Игра Жизнь</title> -->
+	<link rel="stylesheet" href="./assets/css/main.css" />
+	<script src="./assets/js/main.js" type="module"></script>
+</head>
+<body>
+	<header>
+		<div class="container">
+			<div class="controls">
+				<h1>Жизнь</h1>
+				<div class="controls__left">
+					<button id="playPause" class="paused"></button>
+					<button id="randomizeButton">
+						Рандом
+					</button>
+					<button id="nextStepButton">
+						Шаг вперед
+					</button>
+					<div class="generation">
+						Время генерации:
+						<span id="generationTime">
+							*
+						</span>
+						мс
+					</div>
+				</div>
+				<div class="controls__right">
+					<button id="resetButton" class="danger">
+						Очистить
+					</button>
+				</div>
+			</div>
+		</div>
+	</header>
+	<main>
+		<div class="content-wrap">
+			<form id="configure" class="configure">
+				<h2>
+					Параметры
+				</h2>
+				<label class="configure__item">
+					<span class="configure__name">
+						Скорость эволюции:
+					</span>
+					<input 
+						class="configure__input"
+						id="speed" type="number" 
+						value="400" step="20"
+					>
+				</label>
+				<label class="configure__item">
+					<span class="configure__name">
+						Количество колонок:
+					</span>
+					<input 
+						class="configure__input"
+						id="columns" type="number" 
+						value="10" step="10" min="10"
+					>
+				</label>
+				<label class="configure__item">
+					<span class="configure__name">
+						Количество строк:
+					</span>
+					<input 
+						class="configure__input"
+						id="rows" type="number" 
+						value="10" step="10" min="10"
+					>
+				</label>
+				<button>
+					Применить
+				</button>
+			</form>
+			<div class="right-col container">
+				<div class="game-wrap">
+					<div class="game"></div>
+				</div>
+			</div>
+		</div>
+	</main>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+</body>
+</html>
