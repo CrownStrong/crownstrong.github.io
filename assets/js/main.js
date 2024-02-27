@@ -17,6 +17,7 @@ function changeConfig(ev){
 	ev.preventDefault();
 	config.columns = Number(document.getElementById('columns').value);
 	config.rows = Number(document.getElementById('rows').value);
+	config.speed = Number(document.getElementById('speed').value);
 	buildField();
 }
 
