@@ -32,31 +32,43 @@ export class Game{
 		el.classList.toggle('active', rowEl[colIndex]);
 	}
 
+    changeSpeed(ms){
+        this.speed = ms;
+        if(this.played){
+            this.stop();
+            this.played = false;
+            this.playClickHandler();
+        }
+    }
+
+    stop(){
+        clearInterval(this.timer);
+        this.timer = null;
+    }
+    start(){
+        this.timer = setInterval(
+            ()=>{
+                window.requestAnimationFrame(
+                    this.changeItem.bind(this)
+                )
+            },
+            this.speed
+        );
+    }
+
 	playClickHandler(){
 		if(this.played){
-			clearInterval(this.timer);
-			this.timer = null;
+			this.stop();
 		}else{
-			console.log(this.speed);
-			this.timer = setInterval(
-				()=>{
-					window.requestAnimationFrame(
-						this.changeItem.bind(this)
-					)
-				},
-				this.speed
-			);
+			this.start();
 		}
 		this.played = !this.played;
 	}
 
 	changeItem(){
-		// const deleteArray = [];
-		// const addArray = [];
 		const changeArray = [];
-		
 		const begin = performance.now();
-		// Сбор массивов для удаления/добавления эл-ов
+		
 		for(let y = 0; y < this.rowCount; y++){
 			for(let x = 0; x < this.columnCount; x++){
 				const col = this.getNeighbor(x, this.columnCount);
@@ -89,14 +101,14 @@ export class Game{
 	}
 
 	changeElementsByCoordArray(coordArray){
-		console.time('changeElementsByCoordArray');
+		// console.time('changeElementsByCoordArray');
 		coordArray.forEach(({x, y, life}) => {
 			if(this.visibileRows[y] && this.visibileColumns[x]){
 				this.elemets[y][x].classList.toggle('active', life);
 			}
 			this.arrayData[y][x] = life;
 		});
-		console.timeEnd('changeElementsByCoordArray');
+		// console.timeEnd('changeElementsByCoordArray');
 	}
 
 	getNeighbor(index, arrayLength){
