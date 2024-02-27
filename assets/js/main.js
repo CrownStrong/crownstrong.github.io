@@ -17,7 +17,6 @@ function changeConfig(ev){
 	ev.preventDefault();
 	config.columns = Number(document.getElementById('columns').value);
 	config.rows = Number(document.getElementById('rows').value);
-	config.speed = Number(document.getElementById('speed').value);
 	buildField();
 }
 
@@ -84,8 +83,9 @@ document.getElementById('configureButton').addEventListener(
 )
 document.getElementById('speed').addEventListener(
     'change', ev=>{
+		config.speed = Number(ev.target.value);
         GAME.changeSpeed.call(
-            GAME, 
+            GAME,
             Number(ev.target.value)
         )
     }
