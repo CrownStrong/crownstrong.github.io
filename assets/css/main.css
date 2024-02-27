@@ -21,16 +21,32 @@
 *{
     box-sizing: border-box;
 }
-
-body{
+html, body{
     margin: 0;
-    background: var(--surface);
+    position: relative;
     min-height: 100vh;
 }
-
+body{
+    background: var(--surface);
+}
 body, button, input{
     font-family: var(--font-primary);
-    font-size: 14px;
+    font-size: 0.88rem;
+}
+header{
+    background: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0.63rem 0;
+    margin-bottom: 1.43rem;
+    z-index: 5;
+    box-shadow: 0 0 1.25rem 1px var(--shadowColor);
+}
+main{
+    margin-top: 5rem;
 }
 input{
     height: 1.65rem;
@@ -68,39 +84,35 @@ button:disabled,
     pointer-events: none;
     cursor: not-allowed;
 }
-header{
-    background: #fff;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    padding: 10px 0;
-    margin-bottom: 1.43rem;
-    z-index: 5;
-    box-shadow: 0 0 20px 1px var(--shadowColor);
-}
-main{
-    margin-top: 80px;
-}
 h1, h2{
     line-height: 1.25;
 }
 h1{
-    margin: 0;
+    display: none;
 }
 h2{
+    margin: 0 0 1.25rem;
+}
+h3{
+    margin: 0 0 1rem;
+}
+hr{
+    width: 100%;
+    border: none;
+    border-top: 1px solid currentColor;
     margin: 0 0 20px;
+    opacity: .3;
 }
 .container{
-    margin: 0 1.43rem;
+    margin: 0 0.9rem;
 }
 .controls{
     display: flex;
-    align-items: center;
 }
 .controls__left{
-    margin: 0 auto 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: auto;
 }
 
 .game-wrap{
@@ -160,7 +172,6 @@ h2{
     height: 100%;
     width: 1px;
     z-index: 2;
-    background: red;
 }
 .game__item:hover, .game__item:focus{
     opacity: 0.5;
@@ -171,21 +182,62 @@ h2{
 .unvisible > *{
     display: none;
 }
-#playPause:after{
-    content: 'Пауза';
+.buttonLabel{
+    display: none;
 }
-#playPause.paused:after{
-    content: 'Старт';
+.controls__left > button{
+    height: 1.8rem;
+    width: 3rem;
+    margin-right: 0.5ch;
+    background-repeat: no-repeat;
+    padding-left: 2rem;
+    background-position: 50% 50%;
+}
+#playPause{
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 0 8 8'%3e%3cpath fill='currentColor' fill-rule='evenodd' d='M1 0a1 1 0 0 0-1 1v6a1 1 0 0 0 2 0V1c0-.6-.4-1-1-1m5 1v6a1 1 0 0 1-2 0V1a1 1 0 0 1 2 0'/%3e%3c/svg%3e");
+    background-size: 0.75rem auto;
+    padding-left: 1.5rem;
+}
+#playPause.paused{
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='-3 0 28 28'%3e%3cpath d='M21.42 12.55 2.42.31C1.29-.29 0-.23 0 1.95v24.1c0 2 1.38 2.31 2.42 1.64l19-12.24c.78-.8.78-2.1 0-2.9'/%3e%3c/svg%3e");
+}
+#randomizeButton{
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' fill='currenColor' viewBox='0 0 16 16'%3e%3cpath d='M5 4a1 1 0 0 0 0 2 1 1 0 0 0 0-2zm2 4a1 1 0 0 1 1-1 1 1 0 0 1 0 2 1 1 0 0 1-1-1zm4 2a1 1 0 1 0 0 2 1 1 0 1 0 0-2z'/%3e%3cpath fill-rule='evenodd' d='M3.3 1A2.3 2.3 0 0 0 1 3.3v9.4A2.3 2.3 0 0 0 3.3 15h9.4a2.3 2.3 0 0 0 2.3-2.3V3.3A2.3 2.3 0 0 0 12.7 1H3.3zm-.8 2.3a.8.8 0 0 1 .8-.8h9.4a.8.8 0 0 1 .8.8v9.4a.8.8 0 0 1-.8.8H3.3a.8.8 0 0 1-.8-.8V3.3z' clip-rule='evenodd'/%3e%3c/svg%3e");
+    background-size: 1.13rem auto;
+}
+#nextStepButton{
+    background-size: 1.13rem auto;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 24 24'%3e%3cpath fill-rule='evenodd' d='m15.1 4.9 4 3.6 1.9 1.7c.4.5.7 1.1.7 1.8s-.3 1.3-.7 1.8l-1.8 1.7-4 3.6-1 .7c-.2.2-.7.5-1.2.2-.5-.2-.7-.7-.7-1v-2.8c-1.5.1-3 .5-4.3 1.1a7.4 7.4 0 0 0-3.3 3 .7.7 0 0 1-1.5-.3c0-4.7 1.4-7.8 3.4-9.7A9.1 9.1 0 0 1 12.3 8V5c0-.3.2-.8.7-1 .5-.3 1 0 1.2.2l1 .7Zm-1.3.8.4.3 4 3.6a19 19 0 0 1 1.6 1.6c.4.4.4.6.4.8 0 .2 0 .4-.4.8-.3.4-.9 1-1.7 1.6l-4 3.6-.3.3v-2.9c0-.4-.4-.7-.8-.7-2 0-3.9.4-5.6 1.3-1 .4-1.8 1-2.5 1.7.4-3 1.4-5 2.7-6.3 1.7-1.6 3.7-2 5.4-2 .4 0 .8-.4.8-.8V5.7Z' clip-rule='evenodd'/%3e%3c/svg%3e");
+}
+#resetButton{
+    display: flex;
+    align-content: center;
+}
+.generation{
+    flex: 100% 0 0;
+    margin: 10px 20px 0 0;
 }
 .configure{
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, 0);
+    top: 100%;
+    border-radius: 1.43rem 1.43rem 0 0;
     display: flex;
     background: #fff;
     align-self: baseline;
     box-shadow: 0 0 20px 1px var(--shadowColor);
-    flex: 20.5rem 0 0;
+    width: 320px;
     flex-direction: column;
-    padding: 1.43rem;
-    border-radius: 0 1.43rem 1.43rem 0;
+    padding: 0.9rem;
+    transition: .3s ease-out;
+    z-index: 10;
+}
+#configureButton{
+    padding: 4px 10px;
+}
+.configure.opened{
+    transform: translate(-50%, -100%);
 }
 .configure__input{
     margin-left: 2.86rem;
@@ -200,7 +252,59 @@ h2{
 .content-wrap{
     display: flex;
 }
-.generation{
-    display: inline-block;
-    margin: 0 20px;
+@media (min-width: 768px){
+    h1{
+        display: block;
+        margin: 0;
+        font-size: 1.75rem;
+    }
+    .buttonLabel{
+        display: inline;
+    }
+    #playPause:after{
+        content: 'Пауза';
+    }
+    #playPause.paused:after{
+        content: 'Старт';
+    }
+    #playPause{
+        background-position: 0.5rem 0.5rem;
+        padding-left: 1.5rem;
+    }
+    #randomizeButton{
+        background-position: 0.5rem 0.3rem;
+    }
+    #nextStepButton{
+        background-position: 0.5rem 0.3rem;
+    }
+    #resetButton > svg{
+        margin: 0 6px 0 -4px;
+    }
+    #configureButton{
+        display: none;
+    }
+    #configure{
+        position: static;
+        transform: none;
+        transition: none;
+        flex: 320px 0 0;
+    }
+    .generation{
+        flex: auto 0 0;
+        margin: auto 0.9rem;
+    }
+    .controls{
+        align-items: center;
+    }
+    .controls__left{
+        margin: 0 auto 0 0.9rem;
+    }
+    .controls__left > button{
+        height: initial;
+        width: initial;
+        margin-right: 1ch;
+    }
+    .configure{
+        border-radius: 0 1.43rem 1.43rem 0;
+    }
 }
