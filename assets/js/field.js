@@ -8,15 +8,17 @@ export class FieldBuilder{
 		this.observerRow = this.observerRowInit();
 		this.observerColumn = this.observerColumnInit();
 		this.markerTemplate = this.getMarkerTemplate();
+
+        this.repaintThrottle = false;
 	}
 
 	init({columns, rows}){
 		this.rows = rows;
 		this.columns = columns;
+		this.visibileRows = Array(rows).fill(false, 0, rows);
+		this.visibileColumns = Array(columns).fill(false, 0, columns);
 		this.arrayData = this.generateData(columns, rows);
 		this.nodeList = this.getNodeList();
-		this.visibileRows = Array(rows);
-		this.visibileColumns = Array(columns);
 	}
 
 	observerRowInit(){
@@ -24,10 +26,16 @@ export class FieldBuilder{
 			entries=>{
 				entries.forEach(entry=>{
 					const {target, isIntersecting} = entry;
-					this.toggleUnvisibleRowAttr(target, !isIntersecting);
 					const rowIndex = Number(target.getAttribute('data-row'));
 					this.visibileRows.fill(isIntersecting, rowIndex, rowIndex + 10);
+                    this.toggleUnvisibleRowAttr(target, !isIntersecting);
 				});
+                this.repaint(
+                    this.visibileColumns.indexOf(true),
+                    this.visibileColumns.lastIndexOf(true),
+                    this.visibileRows.indexOf(true),
+                    this.visibileRows.lastIndexOf(true)
+                );
 			},
 			{
 				rootMargin: '112px 0px 112px 0px'
@@ -40,11 +48,15 @@ export class FieldBuilder{
 			entries=>{
 				entries.forEach(entry=>{
 					const {target, isIntersecting} = entry;
-					this.toggleUnvisibleColumnAttr(target, !isIntersecting);
 					const columnIndex = Number(target.getAttribute('data-column'));
 					this.visibileColumns.fill(isIntersecting, columnIndex, columnIndex + 10);
 				});
-				// console.log(this.visibileColumns);
+                this.repaint(
+                    this.visibileColumns.indexOf(true),
+                    this.visibileColumns.lastIndexOf(true),
+                    this.visibileRows.indexOf(true),
+                    this.visibileRows.lastIndexOf(true)
+                );
 			},
 			{
 				rootMargin: '0px 112px 0px 112px'
@@ -53,40 +65,36 @@ export class FieldBuilder{
 		return ob;
 	}
 
-	//
-	async toggleUnvisibleColumnAttr(el, unvisibile, _index = 0){
-		let begin = this.visibileRows.indexOf(true);
-		const end = this.visibileRows.lastIndexOf(true);
-		for(let i = begin; i <= end; i++){
-			// console.log(this.visibileRows[i]);
-			if(this.visibileRows[i]){
-				this.repaint(
-					document.querySelector(`[data-row="${i}"]`)
-				)
-			}
-		}
-	}
-	//
-
 	async toggleUnvisibleRowAttr(el, unvisibile, _index = 0){
-		if(!unvisibile) this.repaint(el);
 		el.classList.toggle('unvisible', unvisibile);
 		const nextElement = el.nextSibling;
 		if(nextElement && _index < 10) this.toggleUnvisibleRowAttr(nextElement, unvisibile, ++_index);
 	}
 
-	async repaint(el){
-		const rowIndex = el.getAttribute('data-row');
-		const children = [...el.children];
-		children.forEach((child, childIndex)=>{
-			child.classList.toggle(
-				'active',
-				this.arrayData[rowIndex][childIndex]
-			);
-		})
-	}
+    async repaint(
+        beginColumn,
+        endColumn,
+        beginRow,
+        endRow
+    ){
+        if(
+            beginColumn == -1 ||
+            endColumn == -1 ||
+            beginRow == -1 ||
+            endRow == -1
+        ) return false;
 
-	cleanField(){
+        for(let indexRow = beginRow; indexRow < endRow; indexRow++){
+            for(let indexColumn = beginColumn; indexColumn < endColumn; indexColumn++){
+                this.nodeList[indexRow][indexColumn].classList.toggle(
+                    'active',
+                    this.arrayData[indexRow][indexColumn]
+                )
+            }
+        }
+    }
+
+	async cleanField(){
 		const begin = performance.now();
 		this.arrayData.forEach((row, rowIndex)=>{
 			row.forEach((col, colIndex)=>{
@@ -109,7 +117,10 @@ export class FieldBuilder{
 				const newValue = Math.random() < 0.3;
 				if(old != newValue){
 					this.arrayData[rowIndex][colIndex] = newValue;
-					if(this.visibileRows[rowIndex]){
+					if(
+                        this.visibileRows[rowIndex] &&
+                        this.visibileColumns[colIndex]
+                    ){
 						this.nodeList[rowIndex][colIndex].classList.toggle(
 							'active', 
 							this.arrayData[rowIndex][colIndex]
@@ -142,20 +153,27 @@ export class FieldBuilder{
 	}
 	getRowTemplate(){
 		const rowEl = document.createElement('div');
-		rowEl.classList = 'game__row';
+		rowEl.classList = 'game__row unvisible';
 		return rowEl;
 	}
 	getGameTemplate(){
 		const game = document.createElement('div');
-		game.classList = 'game';
+		game.classList = 'game unvisible';
 		return game;
 	}
+	getMarkerTemplate(){
+		const marker = document.createElement('div');
+		marker.classList = 'game__marker';
+		return marker;
+	}
+    
 	getNodeList(){
 		console.time('generateNodeList');
+        this.observerRow.disconnect();
+        this.observerColumn.disconnect();
 		const game = this.gameTemplate.cloneNode(false);
-		const nodeList = [];
-
 		const row = this.rowTemplate.cloneNode(false);
+		const nodeList = [];
 
 		for(let j = 0; j < this.columns; j++){
 			const button = this.buttonTemplate.cloneNode(false);
@@ -183,17 +201,22 @@ export class FieldBuilder{
 			game.append(clone);
 		}
 		
-		this.wrapper.innerHTML = '';
-		this.wrapper.append(game);
+        this.wrapper.children[0].replaceWith(game);
 		console.timeEnd('generateNodeList');
+
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(()=>{
+                this.wrapper.children[0].classList.remove('unvisible');
+            });
+        }else{
+            window.requestAnimationFrame(()=>{
+                const timer = setTimeout(()=>{
+                    this.wrapper.children[0].classList.remove('unvisible');
+                    clearTimeout(timer);
+                }, 200);
+            })
+        }
+
 		return nodeList;
-	}
-
-
-
-	getMarkerTemplate(){
-		const marker = document.createElement('div');
-		marker.classList = 'game__marker';
-		return marker;
 	}
 }
